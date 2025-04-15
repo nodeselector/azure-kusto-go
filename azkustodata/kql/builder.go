@@ -2,44 +2,34 @@ package kql
 
 import (
 	"errors"
-	"fmt"
+	"strings"
+	"time"
+
 	"github.com/Azure/azure-kusto-go/azkustodata/value"
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
-	"strings"
-	"time"
 )
-
-// stringConstant is an internal type that cannot be created outside the package.  The only two ways to build
-// a stringConstant is to pass a string constant or use a local function to build the stringConstant.
-// This allows us to enforce the use of constants or strings built with injection protection.
-type stringConstant string
-
-// String implements fmt.Stringer.
-func (s stringConstant) String() string {
-	return string(s)
-}
 
 type Builder struct {
 	builder strings.Builder
 }
 
-func New(value stringConstant) *Builder {
+func New(value string) *Builder {
 	return (&Builder{
 		builder: strings.Builder{},
 	}).AddLiteral(value)
 }
 
 func FromBuilder(builder *Builder) *Builder {
-	return New(stringConstant(builder.String()))
+	return New(string(builder.String()))
 }
 
 // String implements fmt.Stringer.
 func (b *Builder) String() string {
 	return b.builder.String()
 }
-func (b *Builder) addBase(value fmt.Stringer) *Builder {
-	b.builder.WriteString(value.String())
+func (b *Builder) addBase(value string) *Builder {
+	b.builder.WriteString(value)
 	return b
 }
 
@@ -56,7 +46,7 @@ func (b *Builder) AddUnsafe(value string) *Builder {
 	return b
 }
 
-func (b *Builder) AddLiteral(value stringConstant) *Builder {
+func (b *Builder) AddLiteral(value string) *Builder {
 	return b.addBase(value)
 }
 
